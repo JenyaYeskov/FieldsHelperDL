@@ -1,0 +1,18 @@
+{
+  "manifest_version": 2,
+  "name": "Fields Helper DL",
+  "version": "1",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://cl.dispatchland.com/loads/view/*",
+        "https://cl.dispatchland.com/trip-monitor/travel-order/*",
+        "https://cl.dispatchland.com/loads/create/*"
+      ],
+      "js": ["content.js"]
+    }
+  ],
+  "browser_action": {
+
+  }
+}
