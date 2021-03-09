@@ -26,8 +26,17 @@ async function setCopyLoadNumberButton() {
     let button = document.createElement("BUTTON");
     let buttonCaption = document.createTextNode("COPY LOAD # ");
 
-    let loadNumberElement = await document.getElementsByClassName("load-block-info");
-    loadNumberElement = loadNumberElement[0].querySelector("h2");
+    let loadNumberElement = new Promise(resolve => {
+        resolve(document.getElementsByClassName("load-block-info"));
+    });
+
+    loadNumberElement = await loadNumberElement;
+
+    loadNumberElement = new Promise(resolve => {
+        resolve(loadNumberElement[0].querySelector("h2"));
+    });
+
+    loadNumberElement = await loadNumberElement;
 
     button.id = "saveButton";
     button.style = "margin-right: 10px;";
@@ -116,11 +125,23 @@ async function setCurrencyField() {
 
 }
 
+function cutLastWordBySlash(url) {
+    return url.slice(0, url.lastIndexOf("/"));
+}
+
+function isCurrentURLMatch(url) {
+
+    return document.URL.includes(url);
+}
+
 async function setAllFields() {
 
     // setCurrencyField();
 
+    if (isCurrentURLMatch("https://cl.dispatchland.com/loads/view") ||
+        isCurrentURLMatch("https://cl.dispatchland.com/trip-monitor/travel-order")) {
 
-    setCopyLoadNumberButton();
+        setCopyLoadNumberButton();
+    }
 }
 
