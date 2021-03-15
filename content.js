@@ -21,31 +21,37 @@ async function copyLoadNumberToClipboard(loadNumberElement) {
 
 }
 
-async function addCopyLoadNumberButton() {
-
+function makeCopyLoadNumberButton() {
     let button = document.createElement("BUTTON");
     let buttonCaption = document.createTextNode("COPY LOAD # ");
-
-    let loadNumberElement = new Promise(resolve => {
-        resolve(document.getElementsByClassName("load-block-info"));
-    });
-
-    loadNumberElement = await loadNumberElement;
-
-    loadNumberElement = new Promise(resolve => {
-        resolve(loadNumberElement[0].querySelector("h2"));
-    });
-
-    loadNumberElement = await loadNumberElement;
 
     button.id = "customCopyButton";
     button.style = "margin-right: 10px;";
 
     button.appendChild(buttonCaption);
+
+    return button;
+}
+
+async function addCopyLoadNumberButton() {
+
+    let button = await makeCopyLoadNumberButton();
+
+    let loadNumberElement = await document.getElementsByClassName("load-block-info");
+    loadNumberElement = await loadNumberElement[0].querySelector("h2");
+
     loadNumberElement.after(button);
 
     button.onclick = () => {
-        copyLoadNumberToClipboard(loadNumberElement)
+        copyLoadNumberToClipboard(loadNumberElement);
+        let copied = document.createElement("p");
+        copied.innerText = "copied";
+        copied.style = "font-weight: bold";
+        button.after(copied);
+
+        setTimeout(() => {
+            copied.remove();
+        }, 4000);
     };
 
 }
@@ -146,8 +152,6 @@ async function setAllFields() {
 
     // setCurrencyField();
 
-    // await addCopyLoadNumberButton();
-
     setInterval(setCopyLoadNumberButton, 1000);
 
 }
@@ -159,8 +163,14 @@ function checkUrl() {
 
 async function setCopyLoadNumberButton() {
 
+    console.log(document.URL);
+
     if (!checkForButton() && checkUrl()) {
-        await addCopyLoadNumberButton();
+        try {
+            await addCopyLoadNumberButton();
+        } catch (e) {
+            console.error(e);
+        }
     }
 }
 
