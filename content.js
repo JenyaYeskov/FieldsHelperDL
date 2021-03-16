@@ -13,12 +13,17 @@ async function getLoadNumber(loadNumberElement) {
     return loadNumber;
 }
 
-async function copyLoadNumberToClipboard(loadNumberElement) {
+async function assureCoping(loadNumber) {
+    return loadNumber === await navigator.clipboard.readText();
+}
+
+async function putLoadNumberToClipboard(loadNumberElement) {
 
     let loadNumber = await getLoadNumber(loadNumberElement);
 
-    navigator.clipboard.writeText(loadNumber);
+    await navigator.clipboard.writeText(loadNumber);
 
+    return assureCoping(loadNumber);
 }
 
 function makeCopyLoadNumberButton() {
@@ -33,27 +38,45 @@ function makeCopyLoadNumberButton() {
     return button;
 }
 
+function makeCopiedIndicator() {
+    let copied = document.createElement("p");
+    copied.innerText = "copied";
+    copied.style = "font-weight: bold";
+
+    return copied;
+}
+
+async function getElementWithLoadNumber() {
+    let loadNumberElement = await document.getElementsByClassName("load-block-info");
+    return await loadNumberElement[0].querySelector("h2");
+}
+
+function setCopiedIndicator(button) {
+    let copied = makeCopiedIndicator();
+    button.after(copied);
+
+    setTimeout(() => {
+        copied.remove();
+    }, 3500);
+}
+
 async function addCopyLoadNumberButton() {
 
     let button = await makeCopyLoadNumberButton();
 
-    let loadNumberElement = await document.getElementsByClassName("load-block-info");
-    loadNumberElement = await loadNumberElement[0].querySelector("h2");
+    //Need to get it here for button positioning
+    let elementWithLoadNumber = await getElementWithLoadNumber();
+    elementWithLoadNumber.after(button);
 
-    loadNumberElement.after(button);
+    button.onclick = async () => {
 
-    button.onclick = () => {
-        copyLoadNumberToClipboard(loadNumberElement);
-        let copied = document.createElement("p");
-        copied.innerText = "copied";
-        copied.style = "font-weight: bold";
-        button.after(copied);
+        let copyResult = await putLoadNumberToClipboard(elementWithLoadNumber);
 
-        setTimeout(() => {
-            copied.remove();
-        }, 4000);
+        if (copyResult) {
+            setCopiedIndicator(button);
+        } else
+            throw "Load number did not copied";
     };
-
 }
 
 
@@ -162,8 +185,6 @@ function checkUrl() {
 }
 
 async function setCopyLoadNumberButton() {
-
-    console.log(document.URL);
 
     if (!checkForButton() && checkUrl()) {
         try {
