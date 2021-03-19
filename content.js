@@ -4,34 +4,34 @@ window.onload = () => {
     setTimeout(setAllFields, 2800);
 };
 
-async function getLoadNumber(loadNumberElement) {
+async function getNumber(numberElement) {
 
-    let loadNumber = loadNumberElement.textContent;
+    let number = numberElement.textContent;
 
-    loadNumber = await loadNumber.substring(loadNumber.indexOf("#") + 1);
+    number = await number.substring(number.indexOf("#") + 1);
 
-    return loadNumber;
+    return number;
 }
 
 async function assureCoping(loadNumber) {
     return loadNumber === await navigator.clipboard.readText();
 }
 
-async function putLoadNumberToClipboard(loadNumberElement) {
+async function putNumberToClipboard(numberElement) {
 
-    let loadNumber = await getLoadNumber(loadNumberElement);
+    let number = await getNumber(numberElement);
 
-    await navigator.clipboard.writeText(loadNumber);
+    await navigator.clipboard.writeText(number);
 
-    return assureCoping(loadNumber);
+    return assureCoping(number);
 }
 
-function makeCopyLoadNumberButton() {
+function makeCopyNumberButton(id, caption) {
     let button = document.createElement("BUTTON");
-    let buttonCaption = document.createTextNode("COPY LOAD # ");
+    let buttonCaption = document.createTextNode(caption);
 
-    button.id = "customCopyButton";
-    button.style = "margin-right: 10px;";
+    button.id = id;
+    button.style.marginRight = "10px";
 
     button.appendChild(buttonCaption);
 
@@ -41,7 +41,7 @@ function makeCopyLoadNumberButton() {
 function makeCopiedIndicator() {
     let copied = document.createElement("p");
     copied.innerText = "copied";
-    copied.style = "font-weight: bold";
+    copied.style.fontWeight = "bold";
 
     return copied;
 }
@@ -51,8 +51,8 @@ async function getElementWithLoadNumber() {
     return await loadNumberElement[0].querySelector("h2");
 }
 
-function setCopiedIndicator(button) {
-    let copied = makeCopiedIndicator();
+async function setCopiedIndicator(button) {
+    let copied = await makeCopiedIndicator();
     button.after(copied);
 
     setTimeout(() => {
@@ -60,17 +60,17 @@ function setCopiedIndicator(button) {
     }, 3500);
 }
 
-async function addCopyLoadNumberButton() {
+async function addCopyNumberButton(id, elementWithNumber, caption) {
 
-    let button = await makeCopyLoadNumberButton();
+    let button = await makeCopyNumberButton(id, caption);
 
     //Need to get it here for button positioning
-    let elementWithLoadNumber = await getElementWithLoadNumber();
-    elementWithLoadNumber.after(button);
+    // let elementWithLoadNumber = await getElementWithLoadNumber();
+    elementWithNumber.after(button);
 
     button.onclick = async () => {
 
-        let copyResult = await putLoadNumberToClipboard(elementWithLoadNumber);
+        let copyResult = await putNumberToClipboard(elementWithNumber);
 
         if (copyResult) {
             setCopiedIndicator(button);
@@ -86,7 +86,7 @@ async function setCurrencyField() {
     let valueContainer = container.getElementsByClassName("styles_select_component__10SHU__value-container css-1hwfws3")[0];
 
     // valueContainer.className = "styles_select_component__10SHU__value-container styles_select_component__10SHU__value-container--has-value css-1hwfws3";
-    valueContainer.removeChild(valueContainer.firstChild);
+    // valueContainer.removeChild(valueContainer.firstChild);
 
     let singleValue = document.createElement("div");
     singleValue.className = "styles_select_component__10SHU__single-value css-1uccc91-singleValue";
@@ -110,22 +110,25 @@ async function setCurrencyField() {
     singleValue.appendChild(valueSpanContainer);
 
     // valueContainer.appendChild(value);
-
-    // valueContainer.dispatchEvent(new Event("change", { bubbles: true }));
-    // valueContainer.dispatchEvent(new Event("blur", { bubbles: true }));
-
-    valueContainer.focus();
-
-    // document.execCommand("insertText", false, "$ United States Dollar USD");
-    document.execCommand("insertHTML", false, singleValue.innerHTML);
-
     let inputContainer = valueContainer.getElementsByClassName("styles_select_component__10SHU__input")[0];
     let inputElement = inputContainer.getElementsByTagName('input')[0];
+
+    valueContainer.value = "$ United States Dollar USD";
+    valueContainer.dispatchEvent(new Event("change", {bubbles: true}));
+    valueContainer.dispatchEvent(new Event("blur", {bubbles: true}));
+    valueContainer.dispatchEvent(new Event("input", {bubbles: true}));
+
+    // valueContainer.focus();
+
+    // document.execCommand("insertText", false, "$ United States Dollar USD");
+    // document.execCommand("insertHTML", false, singleValue.innerHTML);
+    //
     // inputElement.style = "box-sizing: content-box; width: 2px; background: 0px center; border: 0px; font-size: inherit; opacity: 0; outline: 0px; padding: 0px; color: inherit;";
 
-    // inputElement.value = "$ United States Dollar USD";
-    // inputElement.dispatchEvent(new Event("change", { bubbles: true }));
-    // inputElement.dispatchEvent(new Event("blur", { bubbles: true }));
+    inputElement.value = "$ United States Dollar USD";
+    inputElement.dispatchEvent(new Event("change", {bubbles: true}));
+    inputElement.dispatchEvent(new Event("blur", {bubbles: true}));
+    inputElement.dispatchEvent(new Event("input", {bubbles: true}));
 
     // inputElement.focus();
     //
@@ -133,7 +136,7 @@ async function setCurrencyField() {
     //
 
     // let buffer = container.firstChild;
-    valueContainer.appendChild(valueContainer.firstChild);
+    // valueContainer.appendChild(valueContainer.firstChild);
     // container.removeChild(container.firstChild);
 
     // let indicatorsContainer = container.lastChild;
@@ -171,30 +174,84 @@ function isCurrentURLMatch(url) {
     return document.URL.includes(url);
 }
 
-async function setAllFields() {
-
-    // setCurrencyField();
-
-    setInterval(setCopyLoadNumberButton, 1000);
-
-}
-
 function checkUrl() {
     return isCurrentURLMatch("https://cl.dispatchland.com/loads/view") ||
         isCurrentURLMatch("https://cl.dispatchland.com/trip-monitor/travel-order")
 }
 
+function checkForElemByID(id) {
+    return document.querySelector("#" + id) !== null;
+}
+
 async function setCopyLoadNumberButton() {
 
-    if (!checkForButton() && checkUrl()) {
+    if (!checkForElemByID("customCopyLoadNumberButton") && checkUrl()) {
         try {
-            await addCopyLoadNumberButton();
+            let elementWithLoadNumber = await getElementWithLoadNumber();
+
+            await addCopyNumberButton("customCopyLoadNumberButton", elementWithLoadNumber, "COPY LOAD # ");
         } catch (e) {
             console.error(e);
         }
     }
 }
 
-function checkForButton() {
-    return document.querySelector("#customCopyButton") !== null;
+function filt(arr) {
+
+    // return Array.from(elements).filter(element => {
+    //     console.log(element.href);
+    //     return  element.href.includes("/trucks/view/");
+    // });
+
+    return Array.from(arr).filter((element) => element["href"].includes("/trucks/view/"));
+}
+
+async function getElementsWithTruckNumber() {
+    let elements = await document.querySelectorAll(".second-link");
+
+    console.log(await filt(elements));
+
+    // let qwe = [];
+    //
+    // for (let i = 0; i < elements.length; i++) {
+    //     if (elements[i].href.includes("/trucks/view/"))
+    //         qwe.push(elements[i]);
+    // }
+    //
+    // console.log(qwe);
+    //
+    // elements = await Array.from(elements).filter(element => {
+    //     console.log(element.href);
+    //    return  element.href.includes("/trucks/view/");
+    // });
+
+    return elements;
+}
+
+async function setCopyTruckNumberButton() {
+
+    if (!checkForElemByID("customCopyTruckNumberButton") && checkUrl()) {
+
+        try {
+            let elementsWithTruckNumber = await getElementsWithTruckNumber();
+
+            for (const element of elementsWithTruckNumber) {
+                await addCopyNumberButton("customCopyTruckNumberButton", element, "COPY TRUCK # ");
+            }
+
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+}
+
+async function setAllFields() {
+
+    // setCurrencyField();
+
+    setInterval(setCopyLoadNumberButton, 1000);
+
+    setInterval(setCopyTruckNumberButton, 1000);
+
 }
