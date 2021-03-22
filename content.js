@@ -26,25 +26,29 @@ async function putNumberToClipboard(numberElement) {
     return assureCoping(number);
 }
 
+
 function makeCopyNumberButton(id, caption) {
     let button = document.createElement("BUTTON");
     let buttonCaption = document.createTextNode(caption);
 
     button.id = id;
     button.style.marginRight = "10px";
+    button.style.fontWeight = "bold";
+    button.style["border-radius"] = "5px";
 
     button.appendChild(buttonCaption);
 
     return button;
 }
 
+
 function makeCopiedIndicator() {
     let copied = document.createElement("p");
     copied.innerText = "copied";
-    copied.style.fontWeight = "bold";
 
     return copied;
 }
+
 
 async function getElementWithLoadNumber() {
     let loadNumberElement = await document.getElementsByClassName("load-block-info");
@@ -64,8 +68,6 @@ async function addCopyNumberButton(id, elementWithNumber, caption) {
 
     let button = await makeCopyNumberButton(id, caption);
 
-    //Need to get it here for button positioning
-    // let elementWithLoadNumber = await getElementWithLoadNumber();
     elementWithNumber.after(button);
 
     button.onclick = async () => {
@@ -74,9 +76,12 @@ async function addCopyNumberButton(id, elementWithNumber, caption) {
 
         if (copyResult) {
             setCopiedIndicator(button);
+
         } else
             throw "Load number did not copied";
     };
+
+    return button;
 }
 
 
@@ -189,43 +194,31 @@ async function setCopyLoadNumberButton() {
         try {
             let elementWithLoadNumber = await getElementWithLoadNumber();
 
-            await addCopyNumberButton("customCopyLoadNumberButton", elementWithLoadNumber, "COPY LOAD # ");
+            let button = await addCopyNumberButton("customCopyLoadNumberButton", elementWithLoadNumber, "COPY LOAD # ");
+
+            button.style["background-color"] = "blue";
+            button.style["color"] = "white";
+            button.style["padding"] = "10px 16px";
+
         } catch (e) {
             console.error(e);
         }
     }
 }
 
-function filt(arr) {
+async function filt(arr) {
 
-    // return Array.from(elements).filter(element => {
-    //     console.log(element.href);
-    //     return  element.href.includes("/trucks/view/");
-    // });
-
-    return Array.from(arr).filter((element) => element["href"].includes("/trucks/view/"));
+    return await arr.filter((element) => element["href"] && element["href"].includes("/trucks/view/"));
 }
 
 async function getElementsWithTruckNumber() {
     let elements = await document.querySelectorAll(".second-link");
 
-    console.log(await filt(elements));
+    let qqq = await filt(Array.from(elements));
 
-    // let qwe = [];
-    //
-    // for (let i = 0; i < elements.length; i++) {
-    //     if (elements[i].href.includes("/trucks/view/"))
-    //         qwe.push(elements[i]);
-    // }
-    //
-    // console.log(qwe);
-    //
-    // elements = await Array.from(elements).filter(element => {
-    //     console.log(element.href);
-    //    return  element.href.includes("/trucks/view/");
-    // });
+    console.log(qqq)
 
-    return elements;
+    return Array.from(elements).filter((element) => element["href"] && element["href"].includes("/trucks/view/"));
 }
 
 async function setCopyTruckNumberButton() {
@@ -236,7 +229,24 @@ async function setCopyTruckNumberButton() {
             let elementsWithTruckNumber = await getElementsWithTruckNumber();
 
             for (const element of elementsWithTruckNumber) {
-                await addCopyNumberButton("customCopyTruckNumberButton", element, "COPY TRUCK # ");
+                let button = await addCopyNumberButton("customCopyTruckNumberButton", element, "COPY TRUCK # ");
+
+                button.style["background-color"] = "Green";
+                button.style["color"] = "white";
+                button.style["padding"] = "10px 16px";
+
+                let q = document.createElement("BUTTON");
+                let w = document.createElement("BUTTON");
+                let qc = document.createTextNode("O");
+                let wc = document.createTextNode("O");
+
+                q.appendChild(qc);
+                w.appendChild(wc);
+
+
+                button.before(q);
+                button.after(w);
+
             }
 
         } catch (e) {
