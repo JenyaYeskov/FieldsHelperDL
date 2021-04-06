@@ -54,6 +54,7 @@ function makeCopiedIndicator() {
 
 async function getElementWithLoadNumber() {
     let loadNumberElement = await document.getElementsByClassName("load-block-info");
+    console.log(loadNumberElement);
     return await loadNumberElement[0].querySelector("h2");
 }
 
@@ -86,7 +87,83 @@ async function addCopyNumberButton(id, elementWithNumber, caption) {
     return button;
 }
 
+function cutLastWordBySlash(url) {
+    return url.slice(0, url.lastIndexOf("/"));
+}
 
+
+function isCurrentURLMatch(url) {
+
+    return document.URL.includes(url);
+}
+
+function checkUrl() {
+    return isCurrentURLMatch("https://cl.dispatchland.com/loads/view") ||
+        isCurrentURLMatch("https://cl.dispatchland.com/trip-monitor/travel-order")
+}
+
+function checkForElemByID(id) {
+    return document.querySelector("#" + id) !== null;
+}
+
+async function setCopyLoadNumberButton() {
+
+    if (!checkForElemByID("customCopyLoadNumberButton") && checkUrl()) {
+        try {
+            let elementWithLoadNumber = await getElementWithLoadNumber();
+
+            let button = await addCopyNumberButton("customCopyLoadNumberButton", elementWithLoadNumber, "COPY LOAD # ");
+
+            button.style["background-color"] = "blue";
+            button.style["color"] = "white";
+            button.style["padding"] = "8px 12px";
+
+        } catch (e) {
+            console.error(e);
+        }
+    }
+}
+
+async function getElementsWithTruckNumber() {
+    let elements = await document.querySelectorAll(".second-link");
+
+    return Array.from(elements).filter((element) => element["href"] && element["href"].includes("/trucks/view/"));
+}
+
+async function setCopyTruckNumberButton() {
+
+    if (!checkForElemByID("customCopyTruckNumberButton") && checkUrl()) {
+
+        try {
+            let elementsWithTruckNumber = await getElementsWithTruckNumber();
+
+            for (const element of elementsWithTruckNumber) {
+                let button = await addCopyNumberButton("customCopyTruckNumberButton", element, "COPY TRUCK # ");
+
+                button.style["background-color"] = "Green";
+                button.style["color"] = "white";
+                button.style["padding"] = "6px 10px";
+                button.style["font-size"] = "15px";
+            }
+
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+}
+
+async function setAllFields() {
+
+    setInterval(setCopyLoadNumberButton, 1000);
+
+    setInterval(setCopyTruckNumberButton, 1000);
+
+    // setCurrencyField();
+}
+
+
+//TODO
 async function setCurrencyField() {
 
     let container = document.getElementsByClassName("styles_select_component__10SHU__control css-yk16xz-control")[1];
@@ -169,89 +246,5 @@ async function setCurrencyField() {
     // indicatorsContainer.lastChild.className = "styles_select_component__10SHU__indicator styles_select_component__10SHU__dropdown-indicator css-tlfecz-indicatorContainer";
     // indicatorsContainer.insertBefore(indicator1, indicatorsContainer.firstChild);
 
-
-}
-
-function cutLastWordBySlash(url) {
-    return url.slice(0, url.lastIndexOf("/"));
-}
-
-function isCurrentURLMatch(url) {
-
-    return document.URL.includes(url);
-}
-
-function checkUrl() {
-    return isCurrentURLMatch("https://cl.dispatchland.com/loads/view") ||
-        isCurrentURLMatch("https://cl.dispatchland.com/trip-monitor/travel-order")
-}
-
-function checkForElemByID(id) {
-    return document.querySelector("#" + id) !== null;
-}
-
-async function setCopyLoadNumberButton() {
-
-    if (!checkForElemByID("customCopyLoadNumberButton") && checkUrl()) {
-        try {
-            let elementWithLoadNumber = await getElementWithLoadNumber();
-
-            let button = await addCopyNumberButton("customCopyLoadNumberButton", elementWithLoadNumber, "COPY LOAD # ");
-
-            button.style["background-color"] = "blue";
-            button.style["color"] = "white";
-            button.style["padding"] = "8px 12px";
-
-        } catch (e) {
-            console.error(e);
-        }
-    }
-}
-
-async function filt(arr) {
-
-    return await arr.filter((element) => element["href"] && element["href"].includes("/trucks/view/"));
-}
-
-async function getElementsWithTruckNumber() {
-    let elements = await document.querySelectorAll(".second-link");
-
-    let qqq = await filt(Array.from(elements));
-
-    console.log(qqq)
-
-    return Array.from(elements).filter((element) => element["href"] && element["href"].includes("/trucks/view/"));
-}
-
-async function setCopyTruckNumberButton() {
-
-    if (!checkForElemByID("customCopyTruckNumberButton") && checkUrl()) {
-
-        try {
-            let elementsWithTruckNumber = await getElementsWithTruckNumber();
-
-            for (const element of elementsWithTruckNumber) {
-                let button = await addCopyNumberButton("customCopyTruckNumberButton", element, "COPY TRUCK # ");
-
-                button.style["background-color"] = "Green";
-                button.style["color"] = "white";
-                button.style["padding"] = "6px 10px";
-                button.style["font-size"] = "15px";
-            }
-
-        } catch (e) {
-            console.error(e);
-        }
-    }
-
-}
-
-async function setAllFields() {
-
-    // setCurrencyField();
-
-    setInterval(setCopyLoadNumberButton, 1000);
-
-    setInterval(setCopyTruckNumberButton, 1000);
 
 }
