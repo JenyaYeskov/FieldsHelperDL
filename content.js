@@ -150,7 +150,6 @@ async function setCopyTruckNumberButton() {
             console.error(e);
         }
     }
-
 }
 
 async function setAllFields() {
@@ -248,3 +247,37 @@ async function setCurrencyField() {
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
